@@ -629,6 +629,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return this.getFamily() == leaves.getFamily();
     }
 
+    protected int maxLeavesRecursion(){
+        return 256;
+    }
+
     ///////////////////////////////////////////
     // LEAVES COLORS
     ///////////////////////////////////////////

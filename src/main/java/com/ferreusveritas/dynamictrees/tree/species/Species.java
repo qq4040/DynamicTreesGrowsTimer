@@ -877,7 +877,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
         int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
         if (tickSpeed > 0) {
-            double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
+            double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
             if (level.random.nextDouble() < slowFactor) {
                 final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
 
