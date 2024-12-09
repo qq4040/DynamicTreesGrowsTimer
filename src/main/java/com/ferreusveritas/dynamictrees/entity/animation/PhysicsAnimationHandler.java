@@ -50,7 +50,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
                 Minecraft.getInstance().getSoundManager().stop(fallingInstance);
             Species species = entity.getSpecies();
             SoundEvent sound = species.getFallingBranchEndSound(entity.getVolume(), entity.hasLeaves(), onWater);
-            entity.playSound(sound, species.getFallingBranchPitch(entity.getVolume()), 1);
+            entity.playSound(sound, 1, species.getFallingBranchPitch(entity.getVolume()));
             getData(entity).endSoundPlayed = true;
         }
     }
