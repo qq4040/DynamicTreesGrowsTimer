@@ -1906,7 +1906,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param itemStack The itemstack to be used.
      * @return true if item was used, false otherwise
      */
-    public boolean applySubstance(Level level, BlockPos rootPos, BlockPos hitPos, Player player, InteractionHand hand, ItemStack itemStack) {
+    public boolean applySubstance(Level level, BlockPos rootPos, BlockPos hitPos, @Nullable Player player, @Nullable InteractionHand hand, ItemStack itemStack) {
         final SubstanceEffect effect = getSubstanceEffect(itemStack);
 
         if (effect != null) {

@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity.DestroyType;
@@ -24,6 +25,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -32,18 +34,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
@@ -52,21 +51,17 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolActions;
+import org.antlr.runtime.tree.Tree;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
-public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable {
+public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable, BonemealableBlock {
 
     public static final int MAX_RADIUS = 8;
     public static final String NAME_SUFFIX = "_branch";
@@ -242,6 +237,36 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     public BlockState getStateForDecay (BlockState state, LevelAccessor level, BlockPos pos){
         return Blocks.AIR.defaultBlockState();
+    }
+
+    /**
+     * The following 3 methods are overridden by {@link #use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)}
+     * and they are not normally called. However, they are here for mod compatibility.
+     */
+    @Override
+    public boolean isValidBonemealTarget(LevelReader pLevel, BlockPos pPos, BlockState pState, boolean pIsClient){
+        if (!(pLevel instanceof Level level)) return false;
+        BlockPos rootPos = TreeHelper.findRootNode(level, pPos);
+        if (rootPos == BlockPos.ZERO) return false;
+        BlockState rootState = pLevel.getBlockState(rootPos);
+        RootyBlock root = TreeHelper.getRooty(rootState);
+        if (root == null) return false;
+
+        return root.isValidBonemealTarget(pLevel, rootPos, rootState, pIsClient);
+    }
+    @Override
+    public boolean isBonemealSuccess(Level pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
+        return true;
+    }
+    @Override
+    public void performBonemeal(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
+        BlockPos rootPos = TreeHelper.findRootNode(pLevel, pPos);
+        if (rootPos == BlockPos.ZERO) return;
+        BlockState rootState = pLevel.getBlockState(rootPos);
+        RootyBlock root = TreeHelper.getRooty(rootState);
+        if (root == null) return;
+
+        root.performBonemeal(pLevel, pRandom, rootPos, rootState);
     }
 
     ///////////////////////////////////////////

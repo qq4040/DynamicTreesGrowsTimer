@@ -30,6 +30,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -73,7 +75,7 @@ import java.util.Optional;
  * @author ferreusveritas
  */
 @SuppressWarnings("deprecation")
-public class RootyBlock extends BlockWithDynamicHardness implements TreePart, EntityBlock {
+public class RootyBlock extends BlockWithDynamicHardness implements TreePart, EntityBlock, BonemealableBlock {
 
     public static RootyBlockDecayer rootyBlockDecayer = null;
 
@@ -346,6 +348,29 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
      * @param flags
      */
     public int updateRadius(LevelAccessor level, BlockState state, BlockPos pos, int flags, boolean force){ return getRadius(state); }
+
+    /**
+     * The following 3 methods are overridden by {@link #use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)}
+     * and they are not normally called. However, they are here for mod compatibility.
+     */
+    @Override
+    public boolean isValidBonemealTarget(LevelReader pLevel, BlockPos pPos, BlockState pState, boolean pIsClient){
+        if (pLevel instanceof Level level)
+            return getSpecies(pState, level, pPos).canBoneMealTree();
+        return false;
+    }
+    @Override
+    public boolean isBonemealSuccess(Level pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
+        return true;
+    }
+    @Override
+    public void performBonemeal(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
+        Species species = getSpecies(pState, pLevel, pPos);
+        if (species.isValid()){
+            species.applySubstance(pLevel, pPos, pPos, null, null, new ItemStack(Items.BONE_MEAL));
+        }
+
+    }
 
     ///////////////////////////////////////////
     // TREE STUFF
