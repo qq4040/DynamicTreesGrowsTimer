@@ -19,16 +19,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -210,7 +202,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
             return;
         }
 
-        ((LevelAccessor) level).getBlockTicks().schedule(new ScheduledTick<Block>(this,pos.immutable(), 0, TickPriority.HIGH,0));
+        ((LevelAccessor) level).getBlockTicks().schedule(new ScheduledTick<>(this, pos.immutable(), 0, TickPriority.HIGH, 0));
     }
 
     @Override
@@ -227,15 +219,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
         return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getCloneItemStack(muse.state, target, level, muse.pos, player), ItemStack.EMPTY);
     }
-
-//    @Override
-//    protected boolean isAir(BlockState state) {
-//        if (this.museDoesNotExist(access, state, state.getBl)) {
-//            this.scheduleUpdateTick(access, pos);
-//            return false;
-//        }
-//        return false;
-//    }
 
     @Override
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
@@ -325,7 +308,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return SimpleWaterloggedBlock.super.canPlaceLiquid(level, pos, state, fluid);
     }
 
-    protected boolean isWaterLogged(BlockState state) {
+    public boolean isWaterLogged(BlockState state) {
         return state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED);
     }
 
@@ -340,7 +323,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-        return false;
+        return true;
     }
 
 
@@ -376,24 +359,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
                     double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
 
                     switch (((BlockHitResult) target).getDirection()) {
-                        case DOWN:
-                            d1 = y + axisalignedbb.minY - 0.1D;
-                            break;
-                        case UP:
-                            d1 = y + axisalignedbb.maxY + 0.1D;
-                            break;
-                        case NORTH:
-                            d2 = z + axisalignedbb.minZ - 0.1D;
-                            break;
-                        case SOUTH:
-                            d2 = z + axisalignedbb.maxZ + 0.1D;
-                            break;
-                        case WEST:
-                            d0 = x + axisalignedbb.minX - 0.1D;
-                            break;
-                        case EAST:
-                            d0 = x + axisalignedbb.maxX + 0.1D;
-                            break;
+                        case DOWN -> d1 = y + axisalignedbb.minY - 0.1D;
+                        case UP -> d1 = y + axisalignedbb.maxY + 0.1D;
+                        case NORTH -> d2 = z + axisalignedbb.minZ - 0.1D;
+                        case SOUTH -> d2 = z + axisalignedbb.maxZ + 0.1D;
+                        case WEST -> d0 = x + axisalignedbb.minX - 0.1D;
+                        case EAST -> d0 = x + axisalignedbb.maxX + 0.1D;
                     }
 
                     // Safe to spawn particles here since this is a client side only member function.
