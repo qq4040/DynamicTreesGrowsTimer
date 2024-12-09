@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementations will find a suitable area to generate a tree on the ground.
@@ -29,7 +30,7 @@ public interface GroundFinder {
      * If this is not set manually, the ground finder returned will be {@link #SUBTERRANEAN} if {@link DimensionType#hasCeiling()}
      * returns {@code true} or {@link #SURFACE} if {@code false}.
      */
-    Map<ResourceKey<Level>, GroundFinder> GROUND_FINDERS = new HashMap<>();
+    Map<ResourceKey<Level>, GroundFinder> GROUND_FINDERS = new ConcurrentHashMap<>();
 
     /**
      * Finds the {@link BlockPos} of the first ground block for the y-column of the start {@link BlockPos} given.
