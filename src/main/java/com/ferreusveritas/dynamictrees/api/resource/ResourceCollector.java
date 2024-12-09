@@ -20,11 +20,11 @@ public interface ResourceCollector<R> {
     void clear();
 
     static <R> ResourceCollector<R> unordered() {
-        return new SimpleResourceCollector<>(Maps::newConcurrentMap);
+        return new SimpleResourceCollector<>(Maps::newHashMap);
     }
 
     static <R> ResourceCollector<R> ordered() {
-        return new SimpleResourceCollector<>(ConcurrentSkipListMap::new);
+        return new SimpleResourceCollector<>(Maps::newLinkedHashMap);
     }
 
 }
