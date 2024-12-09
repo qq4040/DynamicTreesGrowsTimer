@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.data.DTEntityTypeTags;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.item.Seed;
@@ -253,10 +254,18 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (this.isEntityPassable(pContext)) {
+            return Shapes.empty();
+        }
+        return super.getShape(pState, pLevel, pPos, pContext);
+    }
+
+    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (isLeavesPassable() || this.isEntityPassable(context)) {
             return Shapes.empty();
-        } else if (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
+        } else if (isMovementVanilla()) {
             return Shapes.block();
         } else {
             return Shapes.create(new AABB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
@@ -272,6 +281,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return SUPPORT_SHAPE;
     }
 
+    protected boolean isMovementVanilla(){
+        return DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.VANILLA_LEAVES_COLLISION.get();
+    }
+
     protected boolean isLeavesPassable() {
         return (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.IS_LEAVES_PASSABLE.get()) || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
@@ -285,18 +298,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     public boolean isEntityPassable(@Nullable Entity entity) {
         if (entity instanceof Projectile) //Projectiles such as arrows fly through leaves
-        {
             return true;
-        }
         if (entity instanceof ItemEntity) //Seed items fall through leaves
-        {
             return ((ItemEntity) entity).getItem().getItem() instanceof Seed;
-        }
-        if (entity instanceof LivingEntity) //Bees fly through leaves, otherwise they get stuck :(
-        {
-            return entity instanceof Bee;
-        }
-        return false;
+
+        //Bees fly through leaves, otherwise they get stuck :(
+        return entity != null && entity.getType().is(DTEntityTypeTags.CAN_PASS_THROUGH_LEAVES);
     }
 
     /**
@@ -354,13 +361,13 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (isLeavesPassable() || isEntityPassable(entity)) {
+        if (isMovementVanilla() || isEntityPassable(entity)) {
             super.entityInside(state, level, pos, entity);
         } else {
             if (entity.getDeltaMovement().y < 0.0D && entity.fallDistance < 2.0f) {
                 entity.fallDistance = 0.0f;
                 entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y * 0.5D, entity.getDeltaMovement().z); // Slowly sink into the block
-            } else if (entity.getDeltaMovement().y > 0 && entity.getDeltaMovement().y < 0.25D) {
+            } else if (!isLeavesPassable() && entity.getDeltaMovement().y > 0 && entity.getDeltaMovement().y < 0.25D) {
                 entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y + 0.025, entity.getDeltaMovement().z); // Allow a little climbing
             }
 
