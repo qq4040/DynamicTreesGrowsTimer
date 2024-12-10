@@ -364,7 +364,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         if (isMovementVanilla() || isEntityPassable(entity)) {
             super.entityInside(state, level, pos, entity);
         } else {
-            if (entity.getDeltaMovement().y < 0.0D && entity.fallDistance < 2.0f) {
+            if (entity.getDeltaMovement().y < 0.0D && (isLeavesPassable() || entity.fallDistance < 2.0f)) {
                 entity.fallDistance = 0.0f;
                 entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y * 0.5D, entity.getDeltaMovement().z); // Slowly sink into the block
             } else if (!isLeavesPassable() && entity.getDeltaMovement().y > 0 && entity.getDeltaMovement().y < 0.25D) {

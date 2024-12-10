@@ -131,7 +131,7 @@ public class DTConfigs {
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.comment("Interaction Settings").push("interaction");
-        IS_LEAVES_PASSABLE = SERVER_BUILDER.comment("If enabled all leaves will be passable").
+        IS_LEAVES_PASSABLE = SERVER_BUILDER.comment("If enabled all leaves will be passable. If the Passable Foliage mod is installed this config is overridden").
                 define("isLeavesPassable", false);
         VANILLA_LEAVES_COLLISION = SERVER_BUILDER.comment("If enabled player movement on leaves will not be enhanced").
                 define("vanillaLeavesCollision", false);
