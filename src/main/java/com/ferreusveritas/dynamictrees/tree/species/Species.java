@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.tree.species;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.cell.CellKit;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
 import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
@@ -876,7 +877,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
         int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
         if (tickSpeed > 0) {
-            double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
+            double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
             if (level.random.nextDouble() < slowFactor) {
                 final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
 
@@ -1450,7 +1451,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 float rotChance = rotChance(level, endPos, level.getRandom(), radius);
                 if (branch.checkForRot(level, endPos, this, fertility, radius, level.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != family.getPrimaryThickness()) {
                     if (safeBounds != SafeChunkBounds.ANY) { // worldgen
-                        TreeHelper.ageVolume(level, endPos.below((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
+                        TreeHelper.ageVolume(level, endPos.below(leafMap.getCenter().getY()), leafMap.getLenX() / 2, leafMap.getLenY(), 2, safeBounds);
                     }
                     iter.remove(); // Prune out the rotted end points, so we don't spawn fruit from them.
                 }
