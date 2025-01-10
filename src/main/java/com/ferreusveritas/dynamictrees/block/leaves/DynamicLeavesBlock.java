@@ -29,6 +29,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Bee;
@@ -58,10 +59,7 @@ import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
@@ -143,7 +141,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     @Override
     public int age(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand, SafeChunkBounds safeBounds) {
-        return updateLeaves(level, pos, state, rand,safeBounds == SafeChunkBounds.ANY_WG,null, 0);
+        return updateLeaves(level, pos, state, rand,safeBounds == SafeChunkBounds.ANY_WG);
     }
 
     @Override
@@ -181,41 +179,65 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     /**
-     * Pulses recursively through the canopy, updating hydro and growing around if possible.
-     * If visitedPositions is null, it is not recursive and only the first block will be updated.
-     * @param visitedPositions keeps track of visited blocks for recursive calls. Set to null to make it pulse this block only.
-     * @return the new hydro value
+     * Pulses recursively through the canopy using BFS, updating hydro and growing around if possible.
+     * @return False if the leaves decayed. True if they survived.
      */
-    public int updateLeaves(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand, boolean worldGen, @Nullable HashSet<BlockPos> visitedPositions, int fromHydro){
-        boolean recursive = visitedPositions != null;
-        final LeavesProperties leavesProperties = getProperties();
-        if (recursive){
-            if (visitedPositions.contains(pos) || visitedPositions.size() > leavesProperties.maxLeavesRecursion()) return 0;
-            visitedPositions.add(pos);
-        }
+    public boolean updateAllLeaves(LevelAccessor level, BlockPos startPos, BlockState startState, RandomSource rand, boolean worldGen){
+        //We store the position and hydro of the next block.
+        Queue<Tuple<BlockPos, Integer>> toProcess = new ArrayDeque<>();
+        Set<BlockPos> processedPositions = new HashSet<>();
+        int firstHydro = updateHydro(level, startPos, startState, worldGen);
+        toProcess.add(new Tuple<>(startPos, firstHydro));
+        if (firstHydro == 0) return false;
+        while (!toProcess.isEmpty() && processedPositions.size() <= getProperties().maxLeavesRecursion()){
+            Tuple<BlockPos, Integer> tup = toProcess.remove();
+            BlockPos pos = tup.getA();
+            int hydro = tup.getB();
+            processedPositions.add(pos);
+            for (Direction dir : Direction.values()) { // Go on all 6 sides of this block
+                if (hydro > 1 || rand.nextInt(4) == 0) { // we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
+                    BlockPos sidePos = pos.relative(dir);
+                    if (processedPositions.contains(sidePos)) continue;
+                    BlockState sideState = level.getBlockState(sidePos);
+                    //Check for surrounding leaves. Grow them if there aren't any.
 
-        int newHydro = updateHydro(level, pos, state, worldGen);
-        if (recursive && newHydro > fromHydro) return newHydro; //We do not recurse back through bigger hydro values
-        //Grows new leaves around
-        // We should do this even if the hydro is only 1. Since there could be adjacent branch blocks that could use a leaves block
-        for (Direction dir : Direction.values()) { // Go on all 6 sides of this block
-            if (newHydro > 1 || rand.nextInt(4) == 0) { // we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
-                BlockPos offpos = pos.relative(dir);
-                if (recursive && visitedPositions.contains(offpos)) continue;
-                //attempt to grow new leaves, a null hydro will be calculated from neighbors.
-                growLeavesIfLocationIsSuitable(level, leavesProperties, offpos, null);
-                if (recursive){
-                    //We recursively visit nearby leaves telling them to update too
-                    BlockState sideState = level.getBlockState(offpos);
+                    if (!TreeHelper.isLeaves(sideState)) { //There were no leaves, attempt to grow some
+                        growLeavesIfLocationIsSuitable(level, getProperties(), sidePos, null);
+                    }
+                    int sideHydro;
                     if (TreeHelper.isLeaves(sideState)){
-                        updateLeaves(level, offpos, sideState, rand, worldGen, visitedPositions, newHydro);
+                        sideHydro = updateHydro(level, sidePos, sideState, worldGen);
+                    } else {
+                        sideHydro = 0;
+                    }
+                    //Do not iterate back through bigger hydro values
+                    //or if the leaves failed to grow
+                    if (sideHydro == 0 || sideHydro <= hydro){
+                        toProcess.add(new Tuple<>(sidePos, sideHydro));
                     }
                 }
+            }
+        }
+        return true;
+    }
 
+    public int updateLeaves(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand, boolean worldGen){
+        int newHydro = updateHydro(level, pos, state, worldGen);
+        if (newHydro == 0) return 0; //If the leaves died don't bother
+
+        if (!worldGen && removeIfLightIsInadequate(state, level, pos, rand)) {
+            return 0;
+        }
+
+        for (Direction dir : Direction.values()) {
+            if (newHydro > 1 || rand.nextInt(4) == 0) {
+                BlockPos sidePos = pos.relative(dir);
+                growLeavesIfLocationIsSuitable(level, getProperties(), sidePos, null);
             }
         }
         return newHydro;
     }
+
 
     protected boolean canCheckSurroundings(LevelAccessor accessor, BlockPos pos) {
         if (accessor instanceof Level level){
@@ -229,32 +251,32 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return accessor.isAreaLoaded(pos, 2);
     }
 
-    //TICK -> Destroy leaves if invalid
+    //RANDOM TICK -> Destroy leaves if invalid
     //NEIGHBOR UPDATE -> recalculate hydro
     //TREE PULSE -> recalculate hydro
     //              grows new leaves around (recursive)
-    public int updateHydro(LevelAccessor accesor, BlockPos pos, BlockState state, boolean worldGen){
+    public int updateHydro(LevelAccessor accessor, BlockPos pos, BlockState state, boolean worldGen){
         final LeavesProperties leavesProperties = getProperties();
         final int oldHydro = state.getValue(DISTANCE);
 
-        if (!canCheckSurroundings(accesor, pos)) return oldHydro;
+        if (!canCheckSurroundings(accessor, pos)) return oldHydro;
 
         // Check hydration level.  Dry leaves are dead leaves.
-        final int newHydro = getHydrationLevelFromNeighbors(accesor, pos, leavesProperties);
+        final int newHydro = getHydrationLevelFromNeighbors(accessor, pos, leavesProperties);
 
         if (oldHydro != newHydro) { // Only update if the hydro has changed. A little performance gain.
-            BlockState placeState = getLeavesBlockStateForPlacement(accesor, pos, leavesProperties.getDynamicLeavesState(newHydro), oldHydro, worldGen);
+            BlockState placeState = getLeavesBlockStateForPlacement(accessor, pos, leavesProperties.getDynamicLeavesState(newHydro), oldHydro, worldGen);
             // We do not use the 0x02 flag(update client) for performance reasons. The clients do not need to know the hydration level of the leaves blocks as it
             // does not affect appearance or behavior, unless appearanceChangesWithHydro. For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
             // however if the new hydro is 0, it means the leaves were removed and we do need to update, so the flag is 3.
             int flag = newHydro == 0 ? 3 : (appearanceChangesWithHydro(oldHydro, newHydro) ? 2 : 4);
-            if (newHydro == 0 && !worldGen
-                    && (accesor instanceof Level level)
-                    //if the old hydro is the default then its most likely a block that was just placed and failed
-                    && oldHydro != getProperties().getCellKit().getDefaultHydration()) {
-                dropResources(state, level, pos);
-            }
-            accesor.setBlock(pos, placeState, flag);
+//            if (newHydro == 0 && !worldGen
+//                    && (accessor instanceof Level level)
+//                    //if the old hydro is the default then its most likely a block that was just placed and failed
+//                    && oldHydro != getProperties().getCellKit().getDefaultHydration()) {
+//                dropResources(state, level, pos);
+//            }
+            accessor.setBlock(pos, placeState, flag);
         }
         return newHydro;
     }
@@ -487,9 +509,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
 
         //Pulse through the leaves to update the canopy shape and their hydro values
-        int hydro = updateLeaves(level, pos, level.getBlockState(pos), signal.rand, false, new HashSet<>(), Integer.MAX_VALUE);
+        boolean survived = updateAllLeaves(level, pos, level.getBlockState(pos), signal.rand, false);
         //if hydro was 0 then the leaves have been removed
-        if (hydro == 0){
+        if (!survived){
             signal.success = false;
             return signal;
         }
