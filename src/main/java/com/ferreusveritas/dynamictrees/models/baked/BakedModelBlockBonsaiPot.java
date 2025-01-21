@@ -25,12 +25,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @OnlyIn(Dist.CLIENT)
 public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
 
     protected BakedModel basePotModel;
-    protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new HashMap<>();
+    protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new ConcurrentHashMap<>();
 
     public BakedModelBlockBonsaiPot(BakedModel basePotModel) {
         this.basePotModel = basePotModel;
@@ -48,7 +49,7 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         final Species species = extraData.get(PottedSaplingBlockEntity.SPECIES);
         final BlockState potState = extraData.get(PottedSaplingBlockEntity.POT_MIMIC);
 
-        if (species == null || potState == null || !species.isValid() || !species.getSapling().isPresent()) {
+        if (species == null || potState == null || !species.isValid() || species.getSapling().isEmpty()) {
             return quads;
         }
 
