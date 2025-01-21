@@ -145,6 +145,7 @@ public class PalmLeavesProperties extends LeavesProperties {
             if (state == null) {
                 return null;
             }
+            if (!state.hasProperty(DIRECTION)) return state;
             return state.setValue(DIRECTION, surround == null ? 0 : surround.ordinal() + 1);
         }
 
