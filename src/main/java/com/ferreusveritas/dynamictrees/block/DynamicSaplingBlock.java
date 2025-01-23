@@ -22,7 +22,9 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootDataType;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.IPlantable;
@@ -132,7 +134,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
 
     protected void dropBlock(Level level, BlockState state, BlockPos pos) {
         if (level instanceof ServerLevel serverLevel){
-            getDrops(state, new LootParams.Builder(serverLevel)).forEach((drop) -> popResource(level, pos, drop));
+            getDrops(state, new LootParams.Builder(serverLevel).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY)).forEach((drop) -> popResource(level, pos, drop));
             level.removeBlock(pos, false);
         }
     }

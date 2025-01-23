@@ -317,6 +317,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
         return false;
     }
+    public boolean growLeavesIfLocationIsSuitable(LevelAccessor level, LeavesProperties leavesProp, BlockPos pos, int hydro) {
+        return growLeavesIfLocationIsSuitable(level, leavesProp, pos, (Integer) hydro);
+    }
 
     /**
      * Checks the {@link Block} at the given {@link BlockPos} is suitable for growing new leaves.
