@@ -163,7 +163,11 @@ public class JsonHelper {
 
     private static boolean isModLoaded(JsonElement element){
         return JsonDeserialisers.STRING.deserialise(element)
-                .map(modId -> ModList.get().isLoaded(modId))
+                .map(modId -> {
+                    if (modId.charAt(0) == '!') //returns false if the mod is loaded
+                        return !ModList.get().isLoaded(modId.substring(1));
+                    return ModList.get().isLoaded(modId); //returns true if the mod is loaded
+                })
                 .orElse(true);
     }
 

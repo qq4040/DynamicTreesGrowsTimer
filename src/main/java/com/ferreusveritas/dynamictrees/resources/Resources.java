@@ -120,10 +120,7 @@ public final class Resources {
 
 
     private static void addModResourcePack(IModInfo modInfo) {
-        final IModFile modFile = modInfo.getOwningFile().getFile();
-        if (modFile.getProvider().isValid(modFile)) {
-            addModResourcePack(modFile);
-        }
+
     }
 
     private static void addModResourcePack(IModFile modFile) {
