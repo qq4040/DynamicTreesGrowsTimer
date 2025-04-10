@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.entity;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
+import com.ferreusveritas.dynamictrees.data.DTEntityTypeTags;
 import com.ferreusveritas.dynamictrees.entity.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.entity.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entity.animation.DataAnimationHandler;
@@ -12,7 +13,6 @@ import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache
 import com.ferreusveritas.dynamictrees.models.ModelTracker;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
@@ -417,6 +417,12 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public boolean shouldDie() {
         return tickCount > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
+    }
+
+    @Override
+    public boolean canCollideWith(Entity pEntity) {
+        if (pEntity.getType().is(DTEntityTypeTags.FALLING_TREE_COLLISION_BLACKLIST)) return false;
+        return super.canCollideWith(pEntity);
     }
 
     @OnlyIn(Dist.CLIENT)

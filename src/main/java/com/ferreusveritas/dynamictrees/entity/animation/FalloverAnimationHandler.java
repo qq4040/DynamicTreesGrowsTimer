@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 
 public class FalloverAnimationHandler implements AnimationHandler {
 
+    public static int TICKS_BEFORE_CHECKING_COLLISION = 10;
+
     @Override
     public String getName() {
         return "fallover";
@@ -206,7 +208,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
             }
         }
 
-        if (fallSpeed > 0 && testCollision(entity)) {
+        if (entity.tickCount > TICKS_BEFORE_CHECKING_COLLISION && fallSpeed > 0 && testCollision(entity)) {
             playEndSound(entity);
             flingLeavesParticles(entity, fallSpeed);
             addRotation(entity, -fallSpeed);//pull back to before the collision
