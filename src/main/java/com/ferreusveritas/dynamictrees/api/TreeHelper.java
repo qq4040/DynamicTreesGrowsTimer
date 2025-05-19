@@ -63,10 +63,9 @@ public class TreeHelper {
 
         //The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
         SimpleVoxmap iterMap = leafMap != null ? new SimpleVoxmap(leafMap) : null;
-        Iterable<BlockPos.MutableBlockPos> iterable = iterMap.getAllNonZero();
 
         for (int i = 0; i < iterations; i++) {
-            for (BlockPos.MutableBlockPos iPos : iterable) {
+            for (BlockPos.MutableBlockPos iPos : iterMap.getAllNonZero()) {
                 BlockState blockState = level.getBlockState(iPos);
                 Block block = blockState.getBlock();
                 if (block instanceof DynamicLeavesBlock) {//Special case for leaves
