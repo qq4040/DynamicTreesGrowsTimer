@@ -27,6 +27,7 @@ public class MoundGenFeature extends GenFeature {
     }).setCenter(new BlockPos(2, 3, 2));
 
     public static final ConfigurationProperty<Integer> MOUND_CUTOFF_RADIUS = ConfigurationProperty.integer("mound_cutoff_radius");
+    public static final ConfigurationProperty<Boolean> OFFSET = ConfigurationProperty.bool("offset");
 
     public MoundGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -34,13 +35,14 @@ public class MoundGenFeature extends GenFeature {
 
     @Override
     protected void registerProperties() {
-        this.register(MOUND_CUTOFF_RADIUS);
+        this.register(MOUND_CUTOFF_RADIUS, OFFSET);
     }
 
     @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
-                .with(MOUND_CUTOFF_RADIUS, 5);
+                .with(MOUND_CUTOFF_RADIUS, 5)
+                .with(OFFSET, true);
     }
 
     /**
@@ -60,17 +62,9 @@ public class MoundGenFeature extends GenFeature {
             BlockState initialDirtState = level.getBlockState(rootPos);
             BlockState initialUnderState = level.getBlockState(rootPos.below());
 
-//             if (initialUnderState.isAir() || (!initialUnderState.is(BlockTags.DIRT) && !initialUnderState.is(Tags.Blocks.STONE))) {
-//                 final Biome biome = level.getUncachedNoiseBiome(
-//                         rootPos.getX() >> 2,
-//                         rootPos.getY() >> 2,
-//                         rootPos.getZ() >> 2
-//                 ).value();
-//                 //todo: figure out if needs replacement
-// //                initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-//             }
-
-            rootPos = rootPos.above();
+            if (configuration.get(OFFSET)){
+                rootPos = rootPos.above();
+            }
 
             for (Cell cell : moundMap.getAllNonZeroCells()) {
                 final BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
