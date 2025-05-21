@@ -270,12 +270,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
             // does not affect appearance or behavior, unless appearanceChangesWithHydro. For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
             // however if the new hydro is 0, it means the leaves were removed and we do need to update, so the flag is 3.
             int flag = newHydro == 0 ? 3 : (appearanceChangesWithHydro(oldHydro, newHydro) ? 2 : 4);
-//            if (newHydro == 0 && !worldGen
-//                    && (accessor instanceof Level level)
-//                    //if the old hydro is the default then its most likely a block that was just placed and failed
-//                    && oldHydro != getProperties().getCellKit().getDefaultHydration()) {
-//                dropResources(state, level, pos);
-//            }
             accessor.setBlock(pos, placeState, flag);
         }
         return newHydro;

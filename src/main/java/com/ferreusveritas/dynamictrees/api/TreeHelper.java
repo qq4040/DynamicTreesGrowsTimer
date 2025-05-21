@@ -72,14 +72,14 @@ public class TreeHelper {
                     int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
                     int newHydro = ((Ageable) block).age(level, iPos, blockState, level.getRandom(), safeBounds);//Get new values from neighbors
                     if (newHydro == -1) {
-                        //Leaf block died.  Take it out of the leafMap and iterMap
+                        //Leaf block died. Take it out of the leafMap and iterMap
                         leafMap.setVoxel(iPos, (byte) 0);
                         iterMap.setVoxel(iPos, (byte) 0);
                     } else {
                         //Leaf did not die so the block is still leaves
                         if (prevHydro == newHydro) { //But it didn't change
                             iterMap.setVoxel(iPos, (byte) 0); //Stop iterating over it if it's not changing
-                        } else {//Oh wait.. it did change
+                        } else {//Oh, wait... it did change
                             //Update both maps with this new hydro value
                             leafMap.setVoxel(iPos, (byte) newHydro);
                             iterMap.setVoxel(iPos, (byte) newHydro);
