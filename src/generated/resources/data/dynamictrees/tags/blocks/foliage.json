@@ -8,6 +8,9 @@
     "minecraft:brown_mushroom",
     "minecraft:red_mushroom",
     "minecraft:lily_pad",
+    "minecraft:azalea",
+    "minecraft:flowering_azalea",
+    "minecraft:moss_carpet",
     "#minecraft:flowers",
     "#minecraft:replaceable_by_trees"
   ]

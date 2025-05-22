@@ -1,4 +1,4 @@
-// 1.20.1	2024-07-12T23:59:08.2512879	Loot Tables
+// 1.20.1	2025-05-22T00:45:53.7458363	Loot Tables
 93c6fd50af9d24b45db203fe16a3aa37d576caf8 data/dynamictrees/loot_tables/blocks/acacia_leaves.json
 2ac66fbd2e0b38eaabe31a9fac03c037bf9384b6 data/dynamictrees/loot_tables/blocks/apple.json
 1de7ef929cc5c2b2d483b3ed25ceaf424eee313e data/dynamictrees/loot_tables/blocks/azalea_leaves.json
@@ -7,7 +7,7 @@ eacb255ec5cb78ded08f2be7a6b59c6f9157c7e7 data/dynamictrees/loot_tables/blocks/bi
 ef1fa976875bf29597a90aaf803c09ff2f2ba1be data/dynamictrees/loot_tables/blocks/cocoa.json
 18f016216fefeff85a27e857b47e295c07b651cb data/dynamictrees/loot_tables/blocks/crimson_wart.json
 1ec312242a94eafcc4c39312c096f55ec82262b6 data/dynamictrees/loot_tables/blocks/dark_oak_leaves.json
-62ec36c9f19ab2588bf0fcb7627c2c5b1884ae9d data/dynamictrees/loot_tables/blocks/flowering_azalea_leaves.json
+88740a319761b6503c6ac23e90a2c296de1f6f06 data/dynamictrees/loot_tables/blocks/flowering_azalea_leaves.json
 5339bbabe643ce9bb6d5ec9277c416cd28c43682 data/dynamictrees/loot_tables/blocks/jungle_leaves.json
 5a92eeb178bb190a56ff30b35d8b4122193e0c14 data/dynamictrees/loot_tables/blocks/jungle_undergrowth_leaves.json
 8043f7b4b6f322831d4e25277e9fffd37a5d0f49 data/dynamictrees/loot_tables/blocks/mangrove_leaves.json
