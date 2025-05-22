@@ -79,7 +79,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         Holder<Biome> biome = levelContext.accessor().getBiome(basePos);
         Heightmap.Types heightmap = Heightmap.Types.valueOf(biomeDatabase.getHeightmap(biome).toUpperCase());
         for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), basePos, heightmap)) {
-            BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(levelContext.accessor().getBiome(groundPos));
+            BiomeDatabase.Entry entry = biomeDatabase.getEntry(levelContext.accessor().getBiome(groundPos));
             generateTree(levelContext, entry, disc, originPos, groundPos, safeBounds);
         }
     }
@@ -105,14 +105,14 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
         GeneratorResult result = GeneratorResult.GENERATED;
 
-        BiomePropertySelectors.SpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
+        BiomePropertySelectors.SpeciesSelector speciesSelector = getSpeciesSelector(biomeEntry);
         BiomePropertySelectors.SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, RANDOM);
 
         if (!biomeEntry.isBlacklisted() && speciesSelection.isHandled()) {
             Species species = speciesSelection.getSpecies();
             if (species.isValid()) {
                 if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
-                    if (biomeEntry.getChanceSelector().getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
+                    if (getChanceSelector(biomeEntry).getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
                         Holder<Biome> biome = levelContext.level().getBiome(groundPos);
                         if (!species.generate(new GenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandomDir(RANDOM), circle.radius, safeBounds))) {
                             result = GeneratorResult.FAIL_GENERATION;
@@ -136,6 +136,13 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         return result;
+    }
+
+    protected BiomePropertySelectors.SpeciesSelector getSpeciesSelector (BiomeDatabase.EntryReader biomeEntry){
+        return biomeEntry.getSpeciesSelector();
+    }
+    protected BiomePropertySelectors.ChanceSelector getChanceSelector (BiomeDatabase.EntryReader biomeEntry){
+        return biomeEntry.getChanceSelector();
     }
 
     private void generateConcreteCircle(LevelAccessor level, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds) {
