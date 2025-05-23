@@ -61,7 +61,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         BiomeDatabase biomeDatabase = BiomeDatabases.getDimensionalOrDefault(levelContext.dimensionName());
-        ChunkPos chunkPos = context.level().getChunk(context.origin()).getPos();
+        ChunkPos chunkPos = new ChunkPos(context.origin());
 
         DISC_PROVIDER.getPoissonDiscs(levelContext, chunkPos).forEach(disc ->
                 generateTrees(levelContext, biomeDatabase, disc, context.origin(), SafeChunkBounds.ANY_WG)

@@ -31,7 +31,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
         }
 
         BlockPos originPos = context.origin();
-        ChunkPos chunkPos = level.getChunk(originPos).getPos();
+        ChunkPos chunkPos =  new ChunkPos(context.origin());
         LevelContext levelContext = LevelContext.create(level);
 
         PoissonDisc disc = getDisc(levelContext, chunkPos, originPos).orElse(null);
