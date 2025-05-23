@@ -36,7 +36,7 @@ public class PalmSpecies extends Species {
 
     public PalmSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-        if (!(family instanceof MangroveFamily)) {
+        if (!(family instanceof PalmFamily)) {
             LogManager.getLogger().warn("Family " + family.getRegistryName() + " for palm species " + getRegistryName() + " is not of type "+ PalmFamily.class);
         }
         if (!(leavesProperties instanceof PalmLeavesProperties))
