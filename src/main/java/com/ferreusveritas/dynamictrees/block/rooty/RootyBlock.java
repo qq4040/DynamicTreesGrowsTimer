@@ -514,6 +514,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     // RENDERING
     ///////////////////////////////////////////
 
+    @OnlyIn(Dist.CLIENT)
     public int colorMultiplier(BlockColors blockColors, BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
         final int white = 0xFFFFFFFF;
         if (tintIndex == getSoilProperties().foliageTintIndex)
