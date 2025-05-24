@@ -30,6 +30,7 @@
         }
     ],
     "lang_overrides": {
-        "seed": "Apple Pip"
+        "seed": "Apple Pip",
+        "species": "Apple"
     }
 }
