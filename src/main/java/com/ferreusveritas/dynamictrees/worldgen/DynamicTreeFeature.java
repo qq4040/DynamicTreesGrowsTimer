@@ -84,6 +84,21 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
     }
 
+    private BlockPos OffsetPosIfOnFoliage(LevelAccessor level, BlockPos groundPos){
+        if (isNonReplaceableFoliage(level, groundPos)){
+            if (isNonReplaceableFoliage(level, groundPos.below())){
+                return groundPos.below(2);
+            }
+            return groundPos.below();
+        }
+        return groundPos;
+    }
+
+    private boolean isNonReplaceableFoliage(LevelAccessor pLevel, BlockPos pPos){
+        BlockState state = pLevel.getBlockState(pPos);
+        return !state.isAir() && validTreePos(pLevel, pPos);
+    }
+
     public static boolean validTreePos(LevelSimulatedReader pLevel, BlockPos pPos) {
         return pLevel.isStateAtPosition(pPos, (state) ->
                 state.isAir() || state.is(BlockTags.REPLACEABLE_BY_TREES) || state.is(DTBlockTags.FOLIAGE));
@@ -93,6 +108,8 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         if (groundPos == BlockPos.ZERO) {
             return GeneratorResult.NO_GROUND;
         }
+
+        groundPos = OffsetPosIfOnFoliage(levelContext.accessor(), groundPos);;
 
         // If there is already a rooty block, a cave rooted tree has taken this disc, so ignore
         if (levelContext.accessor().getBlockState(groundPos).getBlock() instanceof RootyBlock) {
