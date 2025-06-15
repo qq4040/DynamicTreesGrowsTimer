@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,17 +21,17 @@ import java.util.Map;
  */
 public class BranchConnectables {
 
-    private static final Map<Block, Map<Family, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer>>> connectablesMap = new HashMap<>();
+    private static final Map<Block, Map<ResourceLocation, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer>>> connectablesMap = new HashMap<>();
 
     //Direction can be null
-    public static void makeBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction, Family family) {
+    public static void makeBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction, ResourceLocation family) {
         var map = connectablesMap.computeIfAbsent(block, k -> new HashMap<>());
         map.putIfAbsent(family, radiusFunction);
     }
     public static void makeBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction) {
-        makeBlockConnectable(block, radiusFunction, Family.NULL_FAMILY);
+        makeBlockConnectable(block, radiusFunction, DynamicTrees.location("null"));
     }
-    public static void replaceBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction, Family family) {
+    public static void replaceBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction, ResourceLocation family) {
         var map = connectablesMap.computeIfAbsent(block, k -> new HashMap<>());
         map.remove(family);
         map.put(family, radiusFunction);
@@ -57,9 +59,9 @@ public class BranchConnectables {
     private static TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> getFunctionForFamily(Block block, Family family){
         var familyMap = connectablesMap.get(block);
         if (familyMap == null) return null;
-        var function = familyMap.get(family);
+        var function = familyMap.get(family.getRegistryName());
         if (function == null){
-            function = familyMap.get(Family.NULL_FAMILY);
+            function = familyMap.get(DynamicTrees.location("null"));
         }
         return function;
     }
