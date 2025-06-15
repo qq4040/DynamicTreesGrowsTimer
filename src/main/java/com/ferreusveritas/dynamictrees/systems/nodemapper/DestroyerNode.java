@@ -38,7 +38,7 @@ public class DestroyerNode extends FindEndsNode {
     }
     @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, @Nullable Direction fromDir) {
-        if (BranchConnectables.getConnectionRadiusForBlock(state, level, pos, fromDir == null ? null : fromDir.getOpposite()) > 0) {
+        if (BranchConnectables.getConnectionRadiusForBlock(state, level, pos, fromDir == null ? null : fromDir.getOpposite(), species.getFamily()) > 0) {
             if (player != null && level instanceof Level) {
                 BlockEntity te = level.getBlockEntity(pos);
                 state.getBlock().onDestroyedByPlayer(state, (Level) level, pos, player, false, level.getFluidState(pos));

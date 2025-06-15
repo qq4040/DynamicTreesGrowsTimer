@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems;
 
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,20 +19,48 @@ import java.util.Map;
  */
 public class BranchConnectables {
 
-    private static final Map<Block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer>> connectablesMap = new HashMap<>();
+    private static final Map<Block, Map<Family, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer>>> connectablesMap = new HashMap<>();
 
     //Direction can be null
+    public static void makeBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction, Family family) {
+        var map = connectablesMap.computeIfAbsent(block, k -> new HashMap<>());
+        map.putIfAbsent(family, radiusFunction);
+    }
     public static void makeBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction) {
-        connectablesMap.putIfAbsent(block, radiusFunction);
+        makeBlockConnectable(block, radiusFunction, Family.NULL_FAMILY);
+    }
+    public static void replaceBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction, Family family) {
+        var map = connectablesMap.computeIfAbsent(block, k -> new HashMap<>());
+        map.remove(family);
+        map.put(family, radiusFunction);
     }
 
     public static boolean isBlockConnectable(Block block) {
         return connectablesMap.containsKey(block);
     }
 
-    public static int getConnectionRadiusForBlock(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
+    public static int getConnectionRadiusForBlock(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side, Family family) {
         final Block block = state.getBlock();
-        return isBlockConnectable(block) ? connectablesMap.get(block).apply(state, world, pos, side) : 0;
+        if (isBlockConnectable(block)){
+            var function = getFunctionForFamily(block, family);
+            if (function == null) return 0;
+            return function.apply(state, world, pos, side);
+        } else {
+            return 0;
+        }
+    }
+    public static int getConnectionRadiusForBlock(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
+        return getConnectionRadiusForBlock(state, world, pos, side, Family.NULL_FAMILY);
     }
 
+    @Nullable
+    private static TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> getFunctionForFamily(Block block, Family family){
+        var familyMap = connectablesMap.get(block);
+        if (familyMap == null) return null;
+        var function = familyMap.get(family);
+        if (function == null){
+            function = familyMap.get(Family.NULL_FAMILY);
+        }
+        return function;
+    }
 }

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.block;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cell.Cell;
 import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -35,7 +36,7 @@ public class NullTreePart implements TreePart {
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         // Connectable blocks such as bee nests and shroomlight will be handled here.
         if (BranchConnectables.isBlockConnectable(state.getBlock())) {
-            int rad = BranchConnectables.getConnectionRadiusForBlock(state, level, pos, side);
+            int rad = BranchConnectables.getConnectionRadiusForBlock(state, level, pos, side, from.getFamily());
             if (rad > 0) {
                 return rad;
             }
