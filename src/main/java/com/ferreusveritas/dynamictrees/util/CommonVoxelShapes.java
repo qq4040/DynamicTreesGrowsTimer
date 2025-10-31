@@ -22,6 +22,8 @@ public final class CommonVoxelShapes {
     public static final VoxelShape HALF_SLAB = Shapes.create(0,0,0,1,0.25,1);
 
     public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
+    @Deprecated
+    public static final VoxelShape MUSHROOM_STEM = SAPLING_TRUNK;
     public static final VoxelShape FAT_SAPLING_TRUNK = Block.box(6.5D, 0D, 6.5D, 9.5D, 5D, 9.5D);
     public static final VoxelShape SAPLING_LEAVES = Block.box(4D, 4D, 4D, 12D, 12D, 12D);
     public static final VoxelShape FAT_SAPLING_LEAVES = Block.box(3D, 4D, 3D, 13D, 14D, 13D);
