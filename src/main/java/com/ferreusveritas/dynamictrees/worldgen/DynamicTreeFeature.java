@@ -28,6 +28,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Arrays;
@@ -96,7 +97,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     private boolean isNonReplaceableFoliage(LevelAccessor pLevel, BlockPos pPos){
         BlockState state = pLevel.getBlockState(pPos);
-        return !state.isAir() && validTreePos(pLevel, pPos);
+        return !state.isAir() && state.getFluidState().isEmpty() && validTreePos(pLevel, pPos);
     }
 
     public static boolean validTreePos(LevelSimulatedReader pLevel, BlockPos pPos) {
