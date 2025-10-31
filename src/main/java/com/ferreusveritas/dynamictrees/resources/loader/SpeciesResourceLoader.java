@@ -107,6 +107,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, this::applyEnvironmentFactors)
                 .register("mega_species", ResourceLocation.class, this::setMegaSpecies)
+                .register("can_craft_mega_seed", Boolean.class, Species::setCanCraftMegaSeed)
                 .register("seed", Seed.class, (species, seed) -> species.setSeed(() -> seed))
                 .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
                 .register("tint_sapling", Boolean.class, Species::setTintSapling)

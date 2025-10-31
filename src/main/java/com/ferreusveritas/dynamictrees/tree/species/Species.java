@@ -2013,6 +2013,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         megaSpecies.preMegaSpecies = this;
     }
 
+    private boolean canCraftMegaSeed = true;
+
+    public void setCanCraftMegaSeed(boolean canCraftMegaSeed) {
+        this.canCraftMegaSeed = canCraftMegaSeed;
+    }
+
+    public boolean canCraftMegaSeed() {
+        return canCraftMegaSeed;
+    }
+
     ///////////////////////////////////////////
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////

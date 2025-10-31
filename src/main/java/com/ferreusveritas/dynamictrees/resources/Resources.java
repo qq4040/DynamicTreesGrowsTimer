@@ -188,7 +188,8 @@ public final class Resources {
         }
 
         private void registerDirtBucketRecipes() {
-            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get()) {
+            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get()
+                    && !DTConfigs.GENERATE_MEGA_SEED_RECIPE.get()) {
                 return;
             }
 

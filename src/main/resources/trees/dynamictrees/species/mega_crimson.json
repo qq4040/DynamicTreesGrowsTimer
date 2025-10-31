@@ -15,6 +15,8 @@
         }
     },
     "leaves_properties": "crimson",
+    "generate_seed": true,
+    "generate_sapling": true,
     "environment_factors" : {
         "#forge:is_cold": 0.25,
         "#forge:is_wet": 0.75
@@ -42,5 +44,12 @@
                 "quantity": 7
             }
         }
-    ]
+    ],
+    "sapling_shape": "fat_round_mushroom_rim",
+    "model_overrides": {
+        "sapling": "dynamictrees:block/smartmodel/large_mushroom_round"
+    },
+    "lang_overrides": {
+        "seed": "Mega Crimson Cap"
+    }
 }

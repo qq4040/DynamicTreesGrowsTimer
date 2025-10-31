@@ -203,7 +203,7 @@ public class DTLootTableProvider extends LootTableProvider {
             );
         }
 
-        public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet) {
+        public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, Item stickItem) {
             return LootTable.lootTable().withPool(
                     LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                             SeedItemLootPoolEntry.lootTableSeedItem()
@@ -213,7 +213,7 @@ public class DTLootTableProvider extends LootTableProvider {
                     )
             ).withPool(
                     LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
-                            LootItem.lootTableItem(Items.STICK)
+                            LootItem.lootTableItem(stickItem)
                                     .apply(SetItemCountFunction.setCount(
                                             UniformGenerator.between(1.0F, 2.0F)
                                     ))

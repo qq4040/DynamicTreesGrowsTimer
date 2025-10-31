@@ -67,6 +67,7 @@ public class DTConfigs {
     public static final ForgeConfigSpec.BooleanValue PODZOL_GEN;
 
     public static final ForgeConfigSpec.BooleanValue GENERATE_DIRT_BUCKET_RECIPES;
+    public static final ForgeConfigSpec.BooleanValue GENERATE_MEGA_SEED_RECIPE;
     public static final ForgeConfigSpec.ConfigValue<String> BIOCHAR_BASE_BREWING_BASE;
 
     public static final ForgeConfigSpec.BooleanValue WORLD_GEN;
@@ -186,6 +187,8 @@ public class DTConfigs {
         COMMON_BUILDER.comment("Miscellaneous Settings").push("misc");
         GENERATE_DIRT_BUCKET_RECIPES = COMMON_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
                 .define("generateDirtBucketRecipes", true);
+        GENERATE_MEGA_SEED_RECIPE = COMMON_BUILDER.comment("If enabled, seeds for mega species can be crafted with four regular seeds.")
+                .define("generateMegaSeedRecipe", false);
         BIOCHAR_BASE_BREWING_BASE = COMMON_BUILDER.comment("The base potion the Biochar Base is brewed from. Minecraft potions use 'awkward'. If you change this, don't forget to update the patchouli manual page too.")
                 .define("biocharBrewingBase", "thick");
         COMMON_BUILDER.pop();
