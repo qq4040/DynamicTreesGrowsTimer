@@ -102,7 +102,7 @@ public final class DTRecipes {
     }
 
     private static ShapedRecipe createSquare(final ResourceLocation registryName, final ItemStack out, final Ingredient ingredient) {
-        return new ShapedRecipe(registryName, "CRAFTING_MISC", CraftingBookCategory.MISC, 2,2, NonNullList.of(ingredient), out);
+        return new ShapedRecipe(registryName, "CRAFTING_MISC", CraftingBookCategory.MISC, 2,2, NonNullList.of(Ingredient.EMPTY, ingredient, ingredient, ingredient, ingredient), out);
     }
 
     private static Ingredient[] ingredients(Collection<Item> items) {
