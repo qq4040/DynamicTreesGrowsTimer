@@ -1894,6 +1894,26 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return new GrowthSubstance();
         }
 
+        if (itemStack.is(DTItemTags.FERTILIZER_HIGH)) {
+            return new GrowthSubstance(200, 30);
+        }
+
+        if (itemStack.is(DTItemTags.FERTILIZER_MEDIUM)) {
+            return new GrowthSubstance(200, 90);
+        }
+
+        if (itemStack.is(DTItemTags.FERTILIZER_LOW)) {
+            return new GrowthSubstance(50, 240);
+        }
+
+        if (itemStack.is(DTItemTags.FERTILIZER_VERY_LOW)) {
+            return new GrowthSubstance(38, 315);
+        }
+
+        if (itemStack.is(DTItemTags.FERTILIZER_MINIMAL)) {
+            return new GrowthSubstance(25, 480);
+        }
+
         return null;
     }
 

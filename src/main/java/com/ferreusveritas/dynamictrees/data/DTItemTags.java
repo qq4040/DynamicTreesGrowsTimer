@@ -28,6 +28,13 @@ public final class DTItemTags {
      */
     public static final TagKey<Item> ENHANCED_FERTILIZER = bind("enhanced_fertilizer");
 
+    // Fertilizer tags with descriptive names based on effect strength
+    public static final TagKey<Item> FERTILIZER_HIGH   = bind("fertilizer_high");
+    public static final TagKey<Item> FERTILIZER_MEDIUM = bind("fertilizer_medium");
+    public static final TagKey<Item> FERTILIZER_LOW = bind("fertilizer_low");
+    public static final TagKey<Item> FERTILIZER_VERY_LOW = bind("fertilizer_very_low");
+    public static final TagKey<Item> FERTILIZER_MINIMAL = bind("fertilizer_minimal");
+
     private static TagKey<Item> bind(String identifier) {
         return ItemTags.create(new ResourceLocation(DynamicTrees.MOD_ID, identifier));
     }

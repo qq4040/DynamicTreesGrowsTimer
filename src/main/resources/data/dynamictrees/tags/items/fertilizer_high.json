@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "tfc:groundcover/guano",
+      "required": false
+    }
+  ]
+}
